@@ -46,15 +46,18 @@ if __name__ == "__main__":
     nos = []
     nolen = 8
     yeslen = 9
+
+    sens_n = 0
+    sensor = "/muse/eeg"
+    # sensor = "/muse/acc"
     for i in range(nolen):
-        nos.append(parse("data/yes-no/no%d.csv" % (i + 1), "/muse/eeg")[1])
+        nos.append(parse("data/yes-no/no%d.csv" % (i + 1), sensor)[1])
     for i in range(yeslen):
-        yess.append(parse("data/yes-no/yes%d.csv" % (i + 1), "/muse/eeg")[1])
+        yess.append(parse("data/yes-no/yes%d.csv" % (i + 1), sensor)[1])
 
     size = min([len(yes[0]) for yes in yess] + [len(no[0]) for no in nos])
 
     print(size)
-    sens_n = 3
     for i, yes1 in enumerate(yess):
         for j, yes2 in enumerate(yess):
             if i == j:
@@ -70,7 +73,7 @@ if __name__ == "__main__":
         for no2 in nos:
             plt.plot(correlate2(yes1[sens_n][:size], no2[sens_n][:size]), "r", alpha=0.5)
 
-    plt.ylim(-1000, 1000)
+    # plt.ylim(-1000, 1000)
     plt.show()
 
 
