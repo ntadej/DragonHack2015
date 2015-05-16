@@ -19,7 +19,7 @@ class MuseServer(ServerThread):
 
         acc_x, acc_y, acc_z = args
 
-        print "%s %f %f %f" % (path, acc_x, acc_y, acc_z)
+        print ("%s %f %f %f" % (path, acc_x, acc_y, acc_z))
 
     # receive EEG data
     @make_method('/muse/eeg', 'ffff')
@@ -27,26 +27,25 @@ class MuseServer(ServerThread):
 
         l_ear, l_forehead, r_forehead, r_ear = args
 
-        print "%s %f %f %f %f" % (path, l_ear, l_forehead, r_forehead, r_ear)
+        print ("%s %f %f %f %f" % (path, l_ear, l_forehead, r_forehead, r_ear))
 
     # handle unexpected messages
     @make_method(None, None)
     def fallback(self, path, args, types, src):
-
-        print "Unknown message \
-        \n\t Source: '%s' \
-        \n\t Address: '%s' \
-        \n\t Types: '%s ' \
-        \n\t Payload: '%s'" \
-        % (src.url, path, types, args)
+        pass
+        # print ("Unknown message \
+        # \n\t Source: '%s' \
+        # \n\t Address: '%s' \
+        # \n\t Types: '%s ' \
+        # \n\t Payload: '%s'" \
+        # % (src.url, path, types, args))
 
 try:
-
     server = MuseServer()
 
-except ServerError, err:
+except ServerError as err:
 
-    print str(err)
+    print(str(err))
 
     sys.exit()
 
