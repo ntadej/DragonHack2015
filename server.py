@@ -9,26 +9,26 @@ from copy import deepcopy
 import numpy as np
 from numpy.fft import fft
 
-acc_lock = th.Lock()
-acc_list = []
-
 
 class MuseServer(ServerThread):
+
+    acc_lock = None
+    acc_list = None
 
     # listen for messages on port 5001
 
     def __init__(self):
-
+        self.acc_lock = th.Lock()
+        self.acc_list = []
         ServerThread.__init__(self, 5001)
 
     # receive accelrometer data
     @make_method('/muse/acc', 'fff')
     def acc_callback(self, path, args):
-        global acc_list
 
-        acc_lock.acquire()
-        acc_list.append(args)
-        acc_lock.release()
+        self.acc_lock.acquire()
+        self.acc_list.append(args)
+        self.acc_lock.release()
 
         acc_x, acc_y, acc_z = args
 
@@ -54,26 +54,21 @@ class MuseServer(ServerThread):
     @make_method(None, None)
     def fallback(self, path, args, types, src):
         pass
-        # print ("Unknown message \
-        # \n\t Source: '%s' \
-        # \n\t Address: '%s' \
-        # \n\t Types: '%s ' \
-        # \n\t Payload: '%s'" \
-        # % (src.url, path, types, args))
-
-try:
-    server = MuseServer()
-
-except ServerError as err:
-
-    print(str(err))
-
-    sys.exit()
-
-server.start()
 
 
 if __name__ == "__main__":
+
+    try:
+        server = MuseServer()
+
+    except ServerError as err:
+
+        print(str(err))
+
+        sys.exit()
+
+    server.start()
+
     t = 5
 
     while 1:
