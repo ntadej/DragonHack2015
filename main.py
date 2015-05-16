@@ -1,6 +1,7 @@
 # coding: UTF-8
 import sys
 import time
+import itertools
 import numpy as np
 from numpy.fft import fft
 
@@ -11,9 +12,12 @@ from server import MuseServer
 
 
 app = Flask(__name__)
-
+calculatedBeat = 0
+mainLock = th.RLock()
 
 def serve():
+    global calculatedBeat
+
     t = 5
 
     while 1:
@@ -22,7 +26,7 @@ def serve():
         server.acc_list = []
         server.acc_lock.release()
 
-        if tmp:
+        if tmp and tmp[0]:
             size = len(tmp[0])
             fs = [i / t for i in range(size // 2)]
             tmp = [np.array(x) - sum(x) / len(x) for x in tmp]
@@ -30,17 +34,44 @@ def serve():
             imax = [sorted(enumerate(x), key=lambda k: abs(k[1]))[-1] for x in acc_fft]
             print(fs[imax[0][0]], fs[imax[0][0]] * 60)
 
+            mainLock.acquire()
+            calculatedBeat = fs[imax[0][0]] * 60
+            mainLock.release()
+
         time.sleep(t)
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    global calculatedBeat
 
+    mainLock.acquire()
+    calculatedBeat = 0
+    mainLock.release()
+
+    return render_template('index.html')
 
 @app.route('/bpm')
 def bpm():
-    return Response("100", mimetype="text/event-stream")
+    def events():
+        while 1:
+            mainLock.acquire()
+            tmpCalculatedBeat = calculatedBeat
+            mainLock.release()
+            if tmpCalculatedBeat != 0:
+                yield "event: calculated\ndata: %d\n\n" % (tmpCalculatedBeat)
+
+            server.acc_lock.acquire()
+            tmpMove = 0
+            if server.acc_list and server.acc_list[-1]:
+                tmpMove = server.acc_list[-1][0]
+            server.acc_lock.release()
+            if tmpMove != 0:
+                yield "event: move\ndata: %d\n\n" % (tmpMove)
+            
+            #yield "event: test\ndata: %d\n\n" % (calculatedBeat)
+            time.sleep(0.02)  # an artificial delay
+    return Response(events(), content_type='text/event-stream')
 
 
 if __name__ == '__main__':
@@ -51,5 +82,5 @@ if __name__ == '__main__':
     ser.start()
     print("Starting local server")
     # serve()
-    app.run("0.0.0.0", port=8080)
+    app.run("0.0.0.0", port=8080, threaded=True)
 

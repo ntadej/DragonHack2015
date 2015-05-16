@@ -18,7 +18,7 @@ class MuseServer(ServerThread):
     # listen for messages on port 5001
 
     def __init__(self):
-        self.acc_lock = th.Lock()
+        self.acc_lock = th.RLock()
         self.acc_list = []
         ServerThread.__init__(self, 5001)
 

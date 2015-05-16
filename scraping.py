@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 
-possibleBPM = ["80-100", "100-120", "120-140", "140-150","150-160","160-170","170-190"]
+possibleBPM = ["80+and+100", "100+and+120", "120+and+140", "140+and+150","150+and+160","160+and+170","170+and+190"]
 possibleGenre = ["Alternative", "Alternative%2FElect.", "Country", "Dance", "Dubstep", "Hip-Hop%2FRap", "Latin", "Pop", "Reggae", "Rock", "R%26B%2FSoul", "Contemporary+Jazz", "Mainstream+Jazz"]
 
 url = "http://jogtunes.com/jtc/jtctuneschoicesigned.php?"
@@ -33,7 +33,7 @@ def getListHTML(bpm="BPM", genre="Genre", artist=""):
 
 def getSongsInArray(htmlList):
     #acceps html from getListHTML() and returns array with Strings of names of songs
-    soup = BeautifulSoup(getListHTML())
+    soup = BeautifulSoup(htmlList)
     allrows = soup.findAll('font', color="#000000")
     songs = []
     counter = 0
@@ -45,7 +45,7 @@ def getSongsInArray(htmlList):
 
 def getArtistsInArray(htmlList):
     #accepts html from getListHTML() and returns array with Strings of names of artists
-    soup = BeautifulSoup(getListHTML())
+    soup = BeautifulSoup(htmlList)
     allrows = soup.findAll('font', color="#000000")
     artists = []
     counter = 0
@@ -55,10 +55,9 @@ def getArtistsInArray(htmlList):
         counter+=1
     return artists
 
-html = getListHTML()
-array = getArtistsInArray(html)
+html = getListHTML(getBPMRange(80))
+artists = getArtistsInArray(html)
+songs = getSongsInArray(html)
 
-for song in array:
-    print(song)
-
-print(getBPMRange(150))
+for artist, song in zip(artists, songs):
+    print(artist, song)

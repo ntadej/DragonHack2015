@@ -47,4 +47,4 @@ def search_by_word(search_term):
     return ''
 
 
-print(search_by_word("test"))
+print(search_by_word("Maroon 5 Secret"))
