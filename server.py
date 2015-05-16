@@ -1,8 +1,16 @@
 from liblo import ServerThread, ServerError, make_method
 
 import sys
-
 import time
+
+import threading as th
+from copy import deepcopy
+
+import numpy as np
+from numpy.fft import fft
+
+acc_lock = th.Lock()
+acc_list = []
 
 
 class MuseServer(ServerThread):
@@ -16,18 +24,31 @@ class MuseServer(ServerThread):
     # receive accelrometer data
     @make_method('/muse/acc', 'fff')
     def acc_callback(self, path, args):
+        global acc_list
+
+        acc_lock.acquire()
+        acc_list.append(args)
+        acc_lock.release()
 
         acc_x, acc_y, acc_z = args
 
-        print ("%s %f %f %f" % (path, acc_x, acc_y, acc_z))
+        #print ("%s %f %f %f" % (path, acc_x, acc_y, acc_z))
 
-    # receive EEG data
-    @make_method('/muse/eeg', 'ffff')
-    def eeg_callback(self, path, args):
+    # # receive blink data
+    # @make_method('/muse/elements/blink', 'i')
+    # def blink_callback(self, path, args):
 
-        l_ear, l_forehead, r_forehead, r_ear = args
+    #     blink, = args
 
-        print ("%s %f %f %f %f" % (path, l_ear, l_forehead, r_forehead, r_ear))
+    #     print ("%s %i" % (path, blink))
+
+    # # receive blink data
+    # @make_method('/muse/elements/jaw_clench', 'i')
+    # def jaw_callback(self, path, args):
+
+    #     jaw, = args
+
+    #     print ("%s %i" % (path, jaw))
 
     # handle unexpected messages
     @make_method(None, None)
@@ -53,6 +74,20 @@ server.start()
 
 
 if __name__ == "__main__":
+    t = 5
 
     while 1:
-        time.sleep(1)
+        acc_lock.acquire()
+        tmp = list(zip(*acc_list))
+        acc_list = []
+        acc_lock.release()
+
+        if tmp:
+            size = len(tmp[0])
+            fs = [i / t for i in range(size // 2)]
+            tmp = [np.array(x) - sum(x) / len(x) for x in tmp]
+            acc_fft = [fft(x)[: size // 2] for x in tmp]
+            imax = [sorted(enumerate(x), key=lambda k: abs(k[1]))[-1] for x in acc_fft]
+            print(fs[imax[0][0]], fs[imax[0][0]] * 60)
+
+        time.sleep(t)
