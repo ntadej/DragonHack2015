@@ -3,6 +3,11 @@ from correlate import *
 
 def pravila(acc_data, times=[],
             duration=0.5, debug=False):
+	""" Dobi acc_data
+	ob casih times
+	ali v zadnjem casu dolzine duration
+	debug vklopi vec outputov
+	"""
     ret = ''
     l = len(acc_data)
     if times != []:
@@ -34,7 +39,6 @@ def pravila(acc_data, times=[],
         r2 += [min(acc_data[i][startI:])]
         r2 += [max(acc_data[i][startI:])]
     return ret, r2
-
 
 def split_inputs(filename, sensor, splits):
     mmax = 500
