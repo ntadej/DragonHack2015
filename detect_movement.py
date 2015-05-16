@@ -1,7 +1,7 @@
 from correlate import *
 
-def pravila(acc_data, times=[]
-			duration=0.5):
+def pravila(acc_data, times=[],
+			duration=0.5, debug=False):
 	ret = ''
 	l = len(acc_data)
 	if times != []:
@@ -15,18 +15,24 @@ def pravila(acc_data, times=[]
 		startI = 0
 	if max(acc_data[0][startI:]) > 500:
 		ret += 'dol '
-	if min(acc_data[0][startI:]) > 500:
+	if min(acc_data[0][startI:]) < -500:
 		ret += 'gor '
 	if max(acc_data[2][startI:]) > 300:
 		ret += 'ndesno '
 	if min(acc_data[2][startI:]) < -500:
 		ret += 'nlevo '
-	if min(acc_data[0][startI:]) < -300 and
-		max(acc_data[0][startI:]) > 200 and
+	if min(acc_data[0][startI:]) < -300 and \
+		max(acc_data[0][startI:]) > 200 and \
 		max(acc_data[2][startI:]) > 200:
 		ret += 'obrat '
 	ret = ret.strip()
-	return ret
+	if not debug:
+		return ret
+	r2 = []
+	for i in range(3):
+		r2 += [min(acc_data[i][startI:])]
+		r2 += [max(acc_data[i][startI:])]
+	return ret, r2
 
 def split_inputs(filename, sensor, splits):
 	mmax = 500
