@@ -42,20 +42,35 @@ def parse(filename, sensor):
 
 
 if __name__ == "__main__":
-    oci1_time, oci1_eeg = parse("data/oci1.csv", "/muse/eeg")
-    oci2_time, oci2_eeg = parse("data/oci2.csv", "/muse/eeg")
-    clean_time, clean_eeg = parse("data/clean.csv", "/muse/eeg")
+    yess = []
+    nos = []
+    nolen = 8
+    yeslen = 9
+    for i in range(nolen):
+        nos.append(parse("data/yes-no/no%d.csv" % (i + 1), "/muse/eeg")[1])
+    for i in range(yeslen):
+        yess.append(parse("data/yes-no/yes%d.csv" % (i + 1), "/muse/eeg")[1])
 
-    size = min(len(oci1_time), len(oci2_time), len(clean_time))
+    size = min([len(yes[0]) for yes in yess] + [len(no[0]) for no in nos])
 
-    print(size, oci1_time[:size])
+    print(size)
+    sens_n = 3
+    for i, yes1 in enumerate(yess):
+        for j, yes2 in enumerate(yess):
+            if i == j:
+                continue
+            plt.plot(correlate2(yes1[sens_n][:size], yes2[sens_n][:size]), "b")
+    for i, no1 in enumerate(nos):
+        for j, no2 in enumerate(nos):
+            if i == j:
+                continue
+            plt.plot(correlate2(no1[sens_n][:size], no2[sens_n][:size]), "k", alpha=0.7)
 
-    plt.plot(correlate2(oci1_eeg[0][:size], oci2_eeg[0][:size]) + 100)
-    plt.plot(correlate2(oci1_eeg[0][:size], clean_eeg[0][:size]) - 100)
-    plt.plot(correlate2(oci2_eeg[0][:size], clean_eeg[0][:size]))
+    for yes1 in yess:
+        for no2 in nos:
+            plt.plot(correlate2(yes1[sens_n][:size], no2[sens_n][:size]), "r", alpha=0.5)
 
-    plt.legend(["oci1-2", "oci1-clean", "oci2-clean"])
-
+    plt.ylim(-1000, 1000)
     plt.show()
 
 
