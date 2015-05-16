@@ -9,6 +9,7 @@ from copy import deepcopy
 import numpy as np
 from numpy.fft import fft
 
+from detect_movement import *
 
 class MuseServer(ServerThread):
 
@@ -56,6 +57,7 @@ class MuseServer(ServerThread):
         pass
 
 
+
 if __name__ == "__main__":
 
     try:
@@ -69,13 +71,13 @@ if __name__ == "__main__":
 
     server.start()
 
-    t = 5
+    t = 0.5
 
     while 1:
-        acc_lock.acquire()
-        tmp = list(zip(*acc_list))
-        acc_list = []
-        acc_lock.release()
+        server.acc_lock.acquire()
+        tmp = list(zip(*server.acc_list))
+        server.acc_list = []
+        server.acc_lock.release()
 
         if tmp:
             size = len(tmp[0])
@@ -84,5 +86,6 @@ if __name__ == "__main__":
             acc_fft = [fft(x)[: size // 2] for x in tmp]
             imax = [sorted(enumerate(x), key=lambda k: abs(k[1]))[-1] for x in acc_fft]
             print(fs[imax[0][0]], fs[imax[0][0]] * 60)
+            print(pravila(tmp, duration=t, debug=True))
 
         time.sleep(t)

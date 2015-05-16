@@ -15,7 +15,7 @@ def naredi_grupe():
     for i in range(yeslen):
         yess.append(parse("data/yes-no/yes%d.csv" % (i + 1), "/muse/eeg")[1])
 
-    size = min([len(yes[0]) for yes in yess] + [len(no[0]) for no in nos])
+    size  =min([len(yes[0]) for yes in yess] + [len(no[0]) for no in nos])
 
     vsi = yess[:-1] + nos[:-1]
     vsi2 = []
