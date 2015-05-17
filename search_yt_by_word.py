@@ -39,7 +39,7 @@ class Search:
     r  = requests.get(iTunesUrl+iTunesTerm+iTunesLimit)
 
     json_result = json.loads(r.text).get('results')
-    
+
     try:
       for key, value in json_result[0].items():
         if key == "trackViewUrl":
@@ -130,7 +130,7 @@ class Search:
 
     # Call the search.list method to retrieve results matching the specified
     # query term.
-    print('here')
+    # print('here')
     search_response = youtube.search().list(
       q=options.q,
       part="id,snippet",

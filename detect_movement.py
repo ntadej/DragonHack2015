@@ -1,15 +1,16 @@
 from correlate import *
 
 
-def pravila(acc_data, times=[],
-            duration=0.5, debug=False):
-	""" Dobi acc_data
-	ob casih times
-	ali v zadnjem casu dolzine duration
-	debug vklopi vec outputov
-	"""
+def pravila(acc_data, times=[], duration=0.5, debug=False):
+    """ Dobi acc_data
+        ob casih times
+        ali v zadnjem casu dolzine duration
+        debug vklopi vec outputov
+    """
     ret = ''
     l = len(acc_data)
+    if not l:
+        return ret
     if times != []:
         endT = times[-1]
         for i in range(l - a, -1, -1):
