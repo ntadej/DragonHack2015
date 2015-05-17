@@ -18,12 +18,27 @@
 </head>
 <body>
   <div class="container">
-    <img src="static/img/beets.jpg" class="logo" />
-    <h1 class="title">Fresh Beets<small> by PyPhy+Dev</small></h1>
-    <h4 class="slogan">The beets you want</h4>
+    <div id="header">
+      <img src="static/img/beets.jpg" id="logo" />
+      <h1 class="title">Fresh Beets<small> by PyPhy+Dev</small></h1>
+      <h4 class="slogan">The beets you want</h4>
+    </div>
 
     <div id="instructions" class="subpage">
-    Navodila!
+      <h4>Instructions</h4>
+      <p>Make sure you are wearing the Muse headband, it is powered on and connected with the computer, and fits tightly. Status message below can help you.</p>
+      <p>Clench your jaw to continue or restart the measurement.</p>
+      <p>Move your head with the beet you want to listen to when the measurement is in progress.</p>
+      <p>Blink twice with your eyes to pause/continue video.</p>
+      <p>Swipe your head rightwards to play next song with the same beet.</p>
+
+      <div class="status">
+        <h5>Muse Status</h5>
+        <div class="status-item"></div>
+        <div class="status-item"></div>
+        <div class="status-item"></div>
+        <div class="status-item"></div>
+      </div>
       <div class="progress"></div>
     </div>
 
@@ -43,17 +58,11 @@
         </div>
       </div>
       <div class="row" id="statistics">
-        <div class="ten columns">
-          <h2>Last recorded BPM: <span id="bpm">Calculating...</span></h2>
-          <h2>Current song: <span id="song">N/A</span>, <a href="" id="itunes" target="_blank">iTunes preview</a></h2>
-        </div>
-        <div class="two columns">
-          <div class="itunes"><div class="overlay"></div></div>
-          
-        </div>
-
-        <div class="progress"></div>
+        <h4><i>Measured BPM:</i> <span id="bpm">Calculating...</span></h4>
+        <h4><i>Current song:</i> <span id="song">N/A</span>, <a href="" id="itunes" target="_blank">iTunes preview</a></h4>
       </div>
+
+      <div class="progress"></div>
     </div>
   </div>
 </body>

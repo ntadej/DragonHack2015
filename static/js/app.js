@@ -35,12 +35,6 @@ var calculatedCallback = function(e)
     var data = JSON.parse(e.data);
 
     $('#bpm').text(data.bpm);
-    
-    if (player) {
-    	player.loadVideoById(data.yt_id);
-	} else {
-		initPlayer(data.yt_id);
-	}
 
 	$('#song').text(data.song);
 	$('#itunes').attr('href', data.itunes_link);
@@ -49,7 +43,14 @@ var calculatedCallback = function(e)
 	bpmStream.removeEventListener('calculated', calculatedCallback, false);
 
 	$('#measuring').fadeOut(animationDuration, function() {
-		$('#result').fadeIn(animationDuration);
+		$('#result').fadeIn(animationDuration, function()
+		{
+		    if (player) {
+				player.loadVideoById(data.yt_id);
+			} else {
+				initPlayer(data.yt_id);
+			}
+		});
 		jawCount = 0;
 		$('#result .progress').width(0);
 	});
@@ -114,6 +115,23 @@ var blinkCallback = function(e)
     	lastBlink = e.data;
     }
 };
+
+var statusCallback = function(e)
+{
+	if (!$('#instructions:visible').length) {
+		return;
+	}
+
+	var data = JSON.parse(e.data);
+	var items = $('.status-item');
+
+	for (var i = 0; i < items.length; i++) {
+		$(items[i]).css('background', data[i] == 1 ? 'green' : 'red');
+	}
+};
+
+var statusStream = new EventSource('/status');
+statusStream.addEventListener('status', statusCallback, false);
 
 var headStream = new EventSource('/headswipe');
 headStream.addEventListener('head', headCallback, false);
