@@ -58,18 +58,18 @@ var calculatedCallback = function(e)
 
 bpmStream.addEventListener('move', moveCallback, false);
 
-var headCallback = function(e)
-{
-	if (!$('#result:visible').length) {
-		return;
-	}
+// var headCallback = function(e)
+// {
+// 	if (!$('#result:visible').length) {
+// 		return;
+// 	}
 
-    console.log(e.type, e.data);
+//     console.log(e.type, e.data);
 
-    $.get('/getnext?bpm=' + $('#bpm').text(), function(response) {
-    	calculatedCallback({ type: 'complete', data: response });
-    });
-};
+//     $.get('/getnext?bpm=' + $('#bpm').text(), function(response) {
+//     	calculatedCallback({ type: 'complete', data: response });
+//     });
+// };
 
 var jawCallback = function(e)
 {
@@ -137,8 +137,8 @@ var statusCallback = function(e)
 var statusStream = new EventSource('/status');
 statusStream.addEventListener('status', statusCallback, false);
 
-var headStream = new EventSource('/headswipe');
-headStream.addEventListener('head', headCallback, false);
+// var headStream = new EventSource('/headswipe');
+// headStream.addEventListener('head', headCallback, false);
 
 var jawStream = new EventSource('/jaw');
 jawStream.addEventListener('jawclench', jawCallback, false);
