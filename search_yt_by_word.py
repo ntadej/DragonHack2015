@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import random
+import re
 
 class Search:
   # Set DEVELOPER_KEY to the API key value from the APIs & auth > Registered apps
@@ -34,9 +35,9 @@ class Search:
   def getItunesLink(self, song):
     #takes concaturated string of artist and song name as arg
     iTunesUrl = "https://itunes.apple.com/search?term="
-    iTunesTerm = song
+    iTunesTerm = re.sub(r'\[.+?\]\s*', '', song)
     iTunesLimit = "&limit=1"
-    r  = requests.get(iTunesUrl+iTunesTerm+iTunesLimit)
+    r = requests.get(iTunesUrl+iTunesTerm+iTunesLimit)
 
     json_result = json.loads(r.text).get('results')
 
@@ -67,9 +68,10 @@ class Search:
     if debug:
       print('Song found', s)
     #return s
-    print(self.getItunesLink(song))
+    #print()
+    itunes = self.getItunesLink(song)
     yid = self.search_by_word(song)
-    return yid
+    return (song, yid, itunes)
 
 
   def getBPMRange(self, bpm):
@@ -124,13 +126,11 @@ class Search:
     return artists
 
   def youtube_search(self, options):
-    print('here')
     youtube = build(self.YOUTUBE_API_SERVICE_NAME, self.YOUTUBE_API_VERSION,
       developerKey=self.DEVELOPER_KEY)
 
     # Call the search.list method to retrieve results matching the specified
     # query term.
-    # print('here')
     search_response = youtube.search().list(
       q=options.q,
       part="id,snippet",

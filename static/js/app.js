@@ -20,7 +20,12 @@ var calculatedCallback = function(e)
 
     $('#bpm').text(data.bpm);
     
-    player.loadVideoById(data.yt_id);
+    if (player) {
+    	player.loadVideoById(data.yt_id);
+	}
+
+	$('#song').text(data.song);
+	$('#itunes').attr('href', data.itunes_link);
 
     //bpmStream.removeEventListener('move', moveCallback, false);
 	bpmStream.removeEventListener('calculated', calculatedCallback, false);

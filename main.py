@@ -18,7 +18,9 @@ app = Flask(__name__)
 calculatedBeat = 0
 mainLock = th.RLock()
 search = Search()
+currentSong = ""
 yt_id = ""
+itunes_link = ""
 
 acc_data_num = 0
 dq = deque()
@@ -26,7 +28,7 @@ headLock = th.RLock()
 
 
 def serve():
-    global calculatedBeat, yt_id
+    global calculatedBeat, currentSong, yt_id, itunes_link
 
     t = 5
 
@@ -49,9 +51,11 @@ def serve():
             local_beat = calculatedBeat
             mainLock.release()
 
-            local_id = search.search_all(local_beat)
+            search_result = search.search_all(local_beat)
 
-            yt_id = local_id
+            mainLock.acquire()
+            currentSong, yt_id, itunes_link = search_result
+            mainLock.release()
 
         acc_data_num = 0
         for i in range(10):
@@ -133,8 +137,8 @@ def bpm():
             mainLock.acquire()
             tmpCalculatedBeat = calculatedBeat
             mainLock.release()
-            if tmpCalculatedBeat != 0 and yt_id != "":
-                yield "event: calculated\ndata: {\"bpm\": %d, \"yt_id\": \"%s\"}\n\n" % (tmpCalculatedBeat, yt_id)
+            if tmpCalculatedBeat != 0 and yt_id != "" and currentSong != "":
+                yield "event: calculated\ndata: {\"bpm\": %d, \"song\": \"%s\", \"yt_id\": \"%s\", \"itunes_link\": \"%s\"}\n\n" % (tmpCalculatedBeat, currentSong, yt_id, itunes_link)
 
             server.acc_lock.acquire()
             tmpMove = 0
