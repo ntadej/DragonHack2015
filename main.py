@@ -33,19 +33,54 @@ stopserveLock = th.Lock()
 def serve():
     global calculatedBeat, currentSong, yt_id, itunes_link, stopserve
 
-    t = 5
+    print("Starting server!!!")
 
+    t = 5
+    # time.sleep(t)
     while 1:
         stopserveLock.acquire()
         if stopserve:
             stopserve = False
             stopserveLock.release()
+            print("Returning server1")
             return
         stopserveLock.release()
 
+
+
+
+
+
+        acc_data_num = 0
+        for i in range(10):
+            stopserveLock.acquire()
+            if stopserve:
+                stopserve = False
+                stopserveLock.release()
+                print("Returning server2")
+                return
+            stopserveLock.release()
+
+            server.acc_lock.acquire()
+            tmp = list(zip(*server.acc_list))
+            raw_tmp = tmp[:]
+            server.acc_lock.release()
+
+            n2 = len(tmp)
+            tmp = tmp[acc_data_num:]
+            acc_data_num = n2
+            podatki = pravila(raw_tmp, duration=t/10)
+            headLock.acquire()
+            if "ndesno" in podatki:
+                dq.append("ndesno")
+            headLock.release()
+
+            time.sleep(t / 10.0)
+
+
+
         server.acc_lock.acquire()
         tmp = list(zip(*server.acc_list))
-        raw_tmp = tmp[:]
         server.acc_list = []
         server.acc_lock.release()
 
@@ -68,29 +103,6 @@ def serve():
             currentSong, yt_id, itunes_link = search_result
             mainLock.release()
 
-        acc_data_num = 0
-        for i in range(10):
-            stopserveLock.acquire()
-            if stopserve:
-                stopserve = False
-                stopserveLock.release()
-                return
-            stopserveLock.release()
-
-            server.acc_lock.acquire()
-            tmp = list(zip(*server.acc_list))
-            server.acc_lock.release()
-
-            n2 = len(tmp)
-            tmp = tmp[acc_data_num:]
-            acc_data_num = n2
-            podatki = pravila(raw_tmp, duration=t/10)
-            headLock.acquire()
-            if "ndesno" in podatki:
-                dq.append("ndesno")
-            headLock.release()
-
-            time.sleep(t / 10.0)
 
 
 ser = th.Thread(target=serve)
@@ -98,13 +110,19 @@ ser = th.Thread(target=serve)
 
 @app.route('/restart')
 def restart():
-    global calculatedBeat, yt_id, ser, stopserve
+    print("restarting serve")
+    global calculatedBeat, yt_id, ser, stopserve, server
 
     mainLock.acquire()
     calculatedBeat = 0
     yt_id = ""
     search.clear()
     mainLock.release()
+
+
+    server.acc_lock.acquire()
+    server.acc_list = []
+    server.acc_lock.release()
 
     stopserveLock.acquire()
     stopserve = True
