@@ -1,15 +1,28 @@
 var bpmStream = new EventSource('/bpm');
+var maxMove = 0;
 
 var moveCallback = function(e)
 {
-    console.log(e.type, e.data);
+	var m = Math.abs(e.data);
+	if (m > maxMove) {
+		maxMove = m;
+	}
+
+	$('#bpm').css('background', 'red');
+	$('#bpm').css('opacity', e.data / (2 * maxMove) + 0.5);
 };
 
 var calculatedCallback = function(e)
 {
     console.log(e.type, e.data);
 
-    bpmStream.removeEventListener('move', moveCallback, false);
+    var data = JSON.parse(e.data);
+
+    $('#bpm').text(data.bpm);
+    
+    player.loadVideoById(data.yt_id);
+
+    //bpmStream.removeEventListener('move', moveCallback, false);
 	bpmStream.removeEventListener('calculated', calculatedCallback, false);
 };
 

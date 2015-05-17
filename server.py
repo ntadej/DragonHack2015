@@ -9,7 +9,7 @@ from copy import deepcopy
 import numpy as np
 from numpy.fft import fft
 
-from detect_movement import *
+#from detect_movement import *
 
 class MuseServer(ServerThread):
 

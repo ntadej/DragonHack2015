@@ -30,9 +30,9 @@ class Search:
     self.used = []
 
   def search_all(self, bpm, debug=False):
-    html = self.getListHTML(A.getBPMRange(80))
-    songs = A.getSongsInArray(html)
-    artists = A.getArtistsInArray(html)
+    html = self.getListHTML(self.getBPMRange(bpm))
+    songs = self.getSongsInArray(html)
+    artists = self.getArtistsInArray(html)
     oboje = []
     for i in range(len(songs)):
       oboje += [artists[i] + ' ' +songs[i]]

@@ -56,6 +56,7 @@ def index():
 
     mainLock.acquire()
     calculatedBeat = 0
+    yt_id = ""
     search.clear()
     mainLock.release()
 
@@ -68,8 +69,8 @@ def bpm():
             mainLock.acquire()
             tmpCalculatedBeat = calculatedBeat
             mainLock.release()
-            if tmpCalculatedBeat != 0:
-                yield "event: calculated\ndata: {'bpm': %d, 'yt_id': %s}\n\n" % (tmpCalculatedBeat, yt_id)
+            if tmpCalculatedBeat != 0 and yt_id != "":
+                yield "event: calculated\ndata: {\"bpm\": %d, \"yt_id\": \"%s\"}\n\n" % (tmpCalculatedBeat, yt_id)
 
             server.acc_lock.acquire()
             tmpMove = 0
