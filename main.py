@@ -178,6 +178,7 @@ def headswipe():
         while 1:
             headLock.acquire()
             event = len(dq) and dq.pop()
+            dq.clear()
             headLock.release()
             if event != 0:
                 yield "event: head\ndata: %s\n\n" % (event)
