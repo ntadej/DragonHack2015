@@ -3,11 +3,11 @@ from correlate import *
 
 def pravila(acc_data, times=[],
             duration=0.5, debug=False):
-	""" Dobi acc_data
-	ob casih times
-	ali v zadnjem casu dolzine duration
-	debug vklopi vec outputov
-	"""
+    """ Dobi acc_data
+    ob casih times
+    ali v zadnjem casu dolzine duration
+    debug vklopi vec outputov
+    """
     ret = ''
     l = len(acc_data)
     if times != []:
@@ -23,7 +23,7 @@ def pravila(acc_data, times=[],
         ret += 'dol '
     if min(acc_data[0][startI:]) < -500:
         ret += 'gor '
-    if max(acc_data[2][startI:]) > 300:
+    if max(acc_data[2][startI:]) > 250:
         ret += 'ndesno '
     if min(acc_data[2][startI:]) < -500:
         ret += 'nlevo '
