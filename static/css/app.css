@@ -4,25 +4,28 @@ html, body {
 
 .subpage,
 .progress {
-	display: none; position: relative;
+	display: none; position: relative; width: 80%; margin: 0 auto;
 }
 
-#instructions {
-
+#header {
+	position: relative;
+	width: 80%; margin: 0 auto;
 }
 
-#measuring {
-
-}
-
-#result {
-
-}
-
-.logo {
-	float: left;
+#logo {
+	position: absolute;
+	left: -100px;
 	max-width: 100px;
 	margin-top: 16px;
+}
+
+#instructions h4,
+#instructions p {
+	text-align: center;
+}
+
+#instructions p {
+	font-size: 1.2em;
 }
 
 .title {
@@ -42,8 +45,9 @@ html, body {
 }
 
 .movement-wrapper {
-	width: 100%;
-	height: 100%;
+	width: 50%;
+	height: 50%;
+	margin: 0 auto;
 }
 
 	.movement {
@@ -53,6 +57,20 @@ html, body {
 		position: relative;
 		top: 50%;
 	}
+
+.status {
+	text-align: center;
+}
+
+.status h5 {
+	margin-bottom: 0;
+}
+
+.status .status-item {
+	display: inline-block;
+	background: red;
+	width:100px; height: 100px;
+}
 
 .video-wrapper {
     width:100%; display:block; position:relative;

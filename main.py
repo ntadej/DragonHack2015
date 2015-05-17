@@ -2,6 +2,7 @@
 import sys
 import time
 import itertools
+import json
 import numpy as np
 from numpy.fft import fft
 from collections import deque
@@ -170,6 +171,20 @@ def index():
     mainLock.release()
 
     return render_template('index.html')
+
+
+@app.route('/status')
+def status():
+    def events():
+        while 1:
+            server.senstate_lock.acquire()
+            event = server.senstate
+            server.senstate_lock.release()
+            if event:
+                yield "event: status\ndata: %s\n\n" % (json.dumps(event))
+
+            time.sleep(0.2)  # an artificial delay
+    return Response(events(), content_type='text/event-stream')
 
 
 @app.route('/headswipe')
