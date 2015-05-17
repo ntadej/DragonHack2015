@@ -26,13 +26,23 @@ acc_data_num = 0
 dq = deque()
 headLock = th.RLock()
 
+stopserve = False
+stopserveLock = th.Lock()
+
 
 def serve():
-    global calculatedBeat, currentSong, yt_id, itunes_link
+    global calculatedBeat, currentSong, yt_id, itunes_link, stopserve
 
     t = 5
 
     while 1:
+        stopserveLock.acquire()
+        if stopserve:
+            stopserve = False
+            stopserveLock.release()
+            return
+        stopserveLock.release()
+
         server.acc_lock.acquire()
         tmp = list(zip(*server.acc_list))
         server.acc_list = []
@@ -59,6 +69,13 @@ def serve():
 
         acc_data_num = 0
         for i in range(10):
+            stopserveLock.acquire()
+            if stopserve:
+                stopserve = False
+                stopserveLock.release()
+                return
+            stopserveLock.release()
+
             server.acc_lock.acquire()
             tmp = list(zip(*server.acc_list))
             server.acc_lock.release()
@@ -75,9 +92,37 @@ def serve():
             time.sleep(t / 10.0)
 
 
+ser = th.Thread(target=serve)
+
+
+@app.route('/restart')
+def restart():
+    global calculatedBeat, yt_id, ser, stopserve
+
+    mainLock.acquire()
+    calculatedBeat = 0
+    yt_id = ""
+    search.clear()
+    mainLock.release()
+
+    stopserveLock.acquire()
+    stopserve = True
+    stopserveLock.release()
+    while True:
+        stopserveLock.acquire()
+        local = stopserve
+        stopserveLock.release()
+        if not local:
+            ser = th.Thread(target=serve)
+            ser.start()
+            break
+
+    return "100"
+
+
 @app.route('/')
 def index():
-    global calculatedBeat
+    global calculatedBeat, yt_id
 
     mainLock.acquire()
     calculatedBeat = 0
@@ -157,7 +202,6 @@ if __name__ == '__main__':
     server = MuseServer()
     server.start()
 
-    ser = th.Thread(target=serve)
     ser.start()
     print("Starting local server")
     # serve()
