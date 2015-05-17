@@ -26,7 +26,7 @@ var moveCallback = function(e)
 
 var calculatedCallback = function(e)
 {
-	if (!$('#measuring:visible').length) {
+	if ($('#instructions:visible').length) {
 		return;
 	}
 
@@ -60,11 +60,15 @@ bpmStream.addEventListener('move', moveCallback, false);
 
 var headCallback = function(e)
 {
-	if (!$('#results:visible').length) {
+	if (!$('#result:visible').length) {
 		return;
 	}
 
     console.log(e.type, e.data);
+
+    $.get('/getnext?bpm=' + $('#bpm').text(), function(response) {
+    	calculatedCallback({ type: 'complete', data: response });
+    });
 };
 
 var jawCallback = function(e)

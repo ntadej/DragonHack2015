@@ -196,6 +196,7 @@ def headswipe():
             dq.clear()
             headLock.release()
             if event != 0:
+                print("head")
                 yield "event: head\ndata: %s\n\n" % (event)
 
             time.sleep(0.1)  # an artificial delay
