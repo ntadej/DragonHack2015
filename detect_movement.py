@@ -10,6 +10,8 @@ def pravila(acc_data, times=[],
     """
     ret = ''
     l = len(acc_data)
+    if not l:
+        return ret
     if times != []:
         endT = times[-1]
         for i in range(l - a, -1, -1):

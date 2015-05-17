@@ -8,6 +8,7 @@ from copy import deepcopy
 
 import numpy as np
 from numpy.fft import fft
+from collections import deque
 
 #from detect_movement import *
 
@@ -16,11 +17,24 @@ class MuseServer(ServerThread):
     acc_lock = None
     acc_list = None
 
+    blink_lock = None
+    blink_list = None
+
+    jaw_lock = None
+    jaw_list = None
+
     # listen for messages on port 5001
 
     def __init__(self):
         self.acc_lock = th.RLock()
         self.acc_list = []
+
+        self.blink_lock = th.RLock()
+        self.blink_list = deque()
+
+        self.jaw_lock = th.RLock()
+        self.jaw_list = deque()
+
         ServerThread.__init__(self, 5001)
 
     # receive accelrometer data
@@ -35,27 +49,27 @@ class MuseServer(ServerThread):
 
         #print ("%s %f %f %f" % (path, acc_x, acc_y, acc_z))
 
-    # # receive blink data
-    # @make_method('/muse/elements/blink', 'i')
-    # def blink_callback(self, path, args):
+    # receive blink data
+    @make_method('/muse/elements/blink', 'i')
+    def blink_callback(self, path, args):
 
-    #     blink, = args
+        if args[0]:
+            self.blink_lock.acquire()
+            self.blink_list.append(time.time())
+            self.blink_lock.release()
 
-    #     print ("%s %i" % (path, blink))
+    # receive blink data
+    @make_method('/muse/elements/jaw_clench', 'i')
+    def jaw_callback(self, path, args):
 
-    # # receive blink data
-    # @make_method('/muse/elements/jaw_clench', 'i')
-    # def jaw_callback(self, path, args):
+        if args[0]:
+            self.jaw_lock.acquire()
+            self.jaw_list.append(time.time())
+            self.jaw_lock.release()
 
-    #     jaw, = args
-
-    #     print ("%s %i" % (path, jaw))
-
-    # handle unexpected messages
     @make_method(None, None)
     def fallback(self, path, args, types, src):
         pass
-
 
 
 if __name__ == "__main__":

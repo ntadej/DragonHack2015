@@ -4,13 +4,15 @@ import time
 import itertools
 import numpy as np
 from numpy.fft import fft
-
+from collections import deque
 
 import threading as th
 import flask as fl
 from flask import Flask, render_template, request, Response, redirect, url_for
 from server import MuseServer
 from search_yt_by_word import Search
+from detect_movement import pravila
+
 
 app = Flask(__name__)
 calculatedBeat = 0
@@ -19,6 +21,10 @@ search = Search()
 currentSong = ""
 yt_id = ""
 itunes_link = ""
+
+acc_data_num = 0
+dq = deque()
+headLock = th.RLock()
 
 
 def serve():
@@ -51,7 +57,22 @@ def serve():
             currentSong, yt_id, itunes_link = search_result
             mainLock.release()
 
-        time.sleep(t)
+        acc_data_num = 0
+        for i in range(10):
+            server.acc_lock.acquire()
+            tmp = list(zip(*server.acc_list))
+            server.acc_lock.release()
+
+            n2 = len(tmp)
+            tmp = tmp[acc_data_num:]
+            acc_data_num = n2
+            podatki = pravila(tmp, duration=t/10)
+            headLock.acquire()
+            if "ndesno" in podatki:
+                dq.append("ndesno")
+            headLock.release()
+
+            time.sleep(t / 10.0)
 
 
 @app.route('/')
@@ -65,6 +86,49 @@ def index():
     mainLock.release()
 
     return render_template('index.html')
+
+
+@app.route('/headswipe')
+def headswipe():
+    def events():
+        while 1:
+            headLock.acquire()
+            event = len(dq) or dq.pop()
+            headLock.release()
+            if event != 0:
+                yield "event: headevent\ndata: %s\n\n" % (event)
+
+            time.sleep(0.1)  # an artificial delay
+    return Response(events(), content_type='text/event-stream')
+
+
+@app.route('/blink')
+def blink():
+    def events():
+        while 1:
+            server.blink_lock.acquire()
+            event = len(server.blink_list) or server.blink_list
+            server.blink_lock.release()
+            if event != 0:
+                yield "event: blinkevent\ndata: %s\n\n" % (event)
+
+            time.sleep(0.05)  # an artificial delay
+    return Response(events(), content_type='text/event-stream')
+
+
+@app.route('/jaw')
+def jaw():
+    def events():
+        while 1:
+            server.jaw_lock.acquire()
+            event = len(server.jaw_list) or server.jaw_list
+            server.jaw_lock.release()
+            if event != 0:
+                yield "event: jawclench\ndata: %s\n\n" % (event)
+
+            time.sleep(0.05)  # an artificial delay
+    return Response(events(), content_type='text/event-stream')
+
 
 @app.route('/bpm')
 def bpm():

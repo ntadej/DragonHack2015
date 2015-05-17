@@ -40,7 +40,7 @@ class Search:
     r = requests.get(iTunesUrl+iTunesTerm+iTunesLimit)
 
     json_result = json.loads(r.text).get('results')
-    
+
     try:
       for key, value in json_result[0].items():
         if key == "trackViewUrl":
