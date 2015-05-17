@@ -5,18 +5,22 @@ import itertools
 import numpy as np
 from numpy.fft import fft
 
+
 import threading as th
 import flask as fl
 from flask import Flask, render_template, request, Response, redirect, url_for
 from server import MuseServer
-
+from search_yt_by_word import Search
 
 app = Flask(__name__)
 calculatedBeat = 0
 mainLock = th.RLock()
+search = Search()
+yt_id = ""
+
 
 def serve():
-    global calculatedBeat
+    global calculatedBeat, yt_id
 
     t = 5
 
@@ -36,7 +40,12 @@ def serve():
 
             mainLock.acquire()
             calculatedBeat = fs[imax[0][0]] * 60
+            local_beat = calculatedBeat
             mainLock.release()
+
+            local_id = search.search_all(local_beat)
+
+            yt_id = local_id
 
         time.sleep(t)
 
@@ -47,6 +56,7 @@ def index():
 
     mainLock.acquire()
     calculatedBeat = 0
+    search.clear()
     mainLock.release()
 
     return render_template('index.html')
@@ -59,7 +69,7 @@ def bpm():
             tmpCalculatedBeat = calculatedBeat
             mainLock.release()
             if tmpCalculatedBeat != 0:
-                yield "event: calculated\ndata: %d\n\n" % (tmpCalculatedBeat)
+                yield "event: calculated\ndata: {'bpm': %d, 'yt_id': %s}\n\n" % (tmpCalculatedBeat, yt_id)
 
             server.acc_lock.acquire()
             tmpMove = 0
@@ -68,7 +78,7 @@ def bpm():
             server.acc_lock.release()
             if tmpMove != 0:
                 yield "event: move\ndata: %d\n\n" % (tmpMove)
-            
+
             #yield "event: test\ndata: %d\n\n" % (calculatedBeat)
             time.sleep(0.02)  # an artificial delay
     return Response(events(), content_type='text/event-stream')
