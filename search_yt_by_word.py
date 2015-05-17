@@ -6,6 +6,8 @@ from apiclient.errors import HttpError
 from oauth2client.tools import argparser
 from bs4 import BeautifulSoup
 import requests
+import json
+import random
 
 class Search:
   # Set DEVELOPER_KEY to the API key value from the APIs & auth > Registered apps
@@ -29,13 +31,30 @@ class Search:
   def clear(self):
     self.used = []
 
+  def getItunesLink(self, song):
+    #takes concaturated string of artist and song name as arg
+    iTunesUrl = "https://itunes.apple.com/search?term="
+    iTunesTerm = song
+    iTunesLimit = "&limit=1"
+    r  = requests.get(iTunesUrl+iTunesTerm+iTunesLimit)
+
+    json_result = json.loads(r.text).get('results')
+    
+    try:
+      for key, value in json_result[0].items():
+        if key == "trackViewUrl":
+          return value
+    except IndexError:
+      return 'http://www2.rdrop.com/~paulmck/DemoGods/'
+
   def search_all(self, bpm, debug=False):
     html = self.getListHTML(self.getBPMRange(bpm))
     songs = self.getSongsInArray(html)
     artists = self.getArtistsInArray(html)
     oboje = []
     for i in range(len(songs)):
-      oboje += [artists[i] + ' ' +songs[i]]
+      oboje += [artists[i] + ' - ' +songs[i]]
+    random.shuffle(oboje)
     for s in oboje:
       if s in self.used:
         continue
@@ -48,12 +67,12 @@ class Search:
     if debug:
       print('Song found', s)
     #return s
+    print(self.getItunesLink(song))
     yid = self.search_by_word(song)
     return yid
 
 
   def getBPMRange(self, bpm):
-
     #returns String (which is part of get request) of BPM range we're searching for
     if bpm < 100:
         return self.possibleBPM[0]
@@ -128,7 +147,6 @@ class Search:
     return videos[0]
 
   def search_by_word(self, search_term):
-
     args = argparser.parse_args()
     args.q = search_term
 
@@ -146,6 +164,3 @@ if __name__ == '__main__':
   print(A.search_all(80, debug = True))
   print(A.search_all(80, debug = True))
   print(A.search_all(80, debug = True))
-
-
-
