@@ -139,6 +139,26 @@ def restart():
     return "100"
 
 
+
+@app.route('/getnext')
+def getnext():
+    print("bpm")
+    bpm = int(request.args.get("bpm", 80))
+    print("bpm2")
+    try:
+        search_result = search.search_all(bpm)
+    except Exception as e:
+        print(e)
+    print(search_result)
+
+    song, yt, itunes = search_result
+
+    return "{\"bpm\": %d, \"song\": \"%s\", \"yt_id\": \"%s\", " \
+           "\"itunes_link\": \"%s\"}\n\n" % (bpm, song, yt, itunes)
+
+
+
+
 @app.route('/')
 def index():
     global calculatedBeat, yt_id
