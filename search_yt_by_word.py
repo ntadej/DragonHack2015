@@ -22,6 +22,8 @@ class Search:
 
 
   def __init__(self):
+    argparser.add_argument("--q", help="Search term", default='Rickroll')
+    argparser.add_argument("--max-results", help="Max results", default=2)
     self.used = []
 
   def clear(self):
@@ -126,9 +128,9 @@ class Search:
     return videos[0]
 
   def search_by_word(self, search_term):
-    argparser.add_argument("--q", help="Search term", default=search_term)
-    argparser.add_argument("--max-results", help="Max results", default=2)
+
     args = argparser.parse_args()
+    args.q = search_term
 
     try:
       return self.youtube_search(args)
