@@ -27,6 +27,29 @@ class Search:
   def clear(self):
     self.used = []
 
+  def search_all(self, bpm, debug=False):
+    html = self.getListHTML(A.getBPMRange(80))
+    songs = A.getSongsInArray(html)
+    artists = A.getArtistsInArray(html)
+    oboje = []
+    for i in range(len(songs)):
+      oboje += [artists[i] + ' ' +songs[i]]
+    for s in oboje:
+      if s in self.used:
+        continue
+      else:
+        self.used += [s]
+        song = s
+        break
+    else:
+      song = 'Not found'
+    if debug:
+      print('Song found', s)
+    #return s
+    yid = self.search_by_word(song)
+    return yid
+
+
   def getBPMRange(self, bpm):
 
     #returns String (which is part of get request) of BPM range we're searching for
@@ -67,12 +90,26 @@ class Search:
         counter+=1
     return songs
 
+  def getArtistsInArray(self, htmlList):
+    #accepts html from getListHTML() and returns array with Strings of names of artists
+    soup = BeautifulSoup(htmlList)
+    allrows = soup.findAll('font', color="#000000")
+    artists = []
+    counter = 0
+    for row in allrows:
+        if counter % 7 == 1:
+            artists.append(row.text)
+        counter+=1
+    return artists
+
   def youtube_search(self, options):
+    print('here')
     youtube = build(self.YOUTUBE_API_SERVICE_NAME, self.YOUTUBE_API_VERSION,
       developerKey=self.DEVELOPER_KEY)
 
     # Call the search.list method to retrieve results matching the specified
     # query term.
+    print('here')
     search_response = youtube.search().list(
       q=options.q,
       part="id,snippet",
@@ -99,26 +136,11 @@ class Search:
       print("An HTTP error %d occurred:\n%s" % (e.resp.status, e.content))
       return ''
 
-  def search_all(self, bpm, debug=False):
-    html = self.getListHTML(A.getBPMRange(80))
-    songs = A.getSongsInArray(html)
-    for s in songs:
-      if s in self.used:
-        continue
-      else:
-        self.used += [s]
-        song = s
-        break
-    else:
-      song = 'Not found'
-    if debug:
-      print('Song found', s)
-    #return s
-    yid = self.search_by_word(song)
-    return yid
+
 
 if __name__ == '__main__':
   A = Search()
+  print(A.search_by_word('goska'))
   print(A.search_all(80, debug = True))
   print(A.search_all(80, debug = True))
   print(A.search_all(80, debug = True))
