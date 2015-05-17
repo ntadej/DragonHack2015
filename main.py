@@ -45,6 +45,7 @@ def serve():
 
         server.acc_lock.acquire()
         tmp = list(zip(*server.acc_list))
+        raw_tmp = tmp[:]
         server.acc_list = []
         server.acc_lock.release()
 
@@ -83,7 +84,7 @@ def serve():
             n2 = len(tmp)
             tmp = tmp[acc_data_num:]
             acc_data_num = n2
-            podatki = pravila(tmp, duration=t/10)
+            podatki = pravila(raw_tmp, duration=t/10)
             headLock.acquire()
             if "ndesno" in podatki:
                 dq.append("ndesno")
