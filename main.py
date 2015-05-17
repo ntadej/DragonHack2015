@@ -139,10 +139,10 @@ def headswipe():
     def events():
         while 1:
             headLock.acquire()
-            event = len(dq) or dq.pop()
+            event = len(dq) and dq.pop()
             headLock.release()
             if event != 0:
-                yield "event: headevent\ndata: %s\n\n" % (event)
+                yield "event: head\ndata: %s\n\n" % (event)
 
             time.sleep(0.1)  # an artificial delay
     return Response(events(), content_type='text/event-stream')
@@ -153,10 +153,10 @@ def blink():
     def events():
         while 1:
             server.blink_lock.acquire()
-            event = len(server.blink_list) or server.blink_list
+            event = len(server.blink_list) and server.blink_list.pop()
             server.blink_lock.release()
             if event != 0:
-                yield "event: blinkevent\ndata: %s\n\n" % (event)
+                yield "event: blink\ndata: %s\n\n" % (event)
 
             time.sleep(0.05)  # an artificial delay
     return Response(events(), content_type='text/event-stream')
@@ -167,7 +167,7 @@ def jaw():
     def events():
         while 1:
             server.jaw_lock.acquire()
-            event = len(server.jaw_list) or server.jaw_list
+            event = len(server.jaw_list) and server.jaw_list.pop()
             server.jaw_lock.release()
             if event != 0:
                 yield "event: jawclench\ndata: %s\n\n" % (event)

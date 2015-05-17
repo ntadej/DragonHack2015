@@ -61,7 +61,7 @@ class Search:
         continue
       else:
         self.used += [s]
-        song = s
+        song = s.strip()
         break
     else:
       song = 'Not found'

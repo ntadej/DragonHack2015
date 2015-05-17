@@ -5,14 +5,26 @@
   firstScriptTag.parentNode.insertBefore(videoTag, firstScriptTag);
 
   var player;
-  function onYouTubeIframeAPIReady() {
+  /*function onYouTubeIframeAPIReady() {
+    
+  }*/
+
+  function initPlayer() {
     player = new YT.Player('player', {
-      height: '576',
-      width: '1024',
+      height: '100%',
+      width: '100%',
       // videoId: '',
       // events: {
       //   'onReady': onPlayerReady,
       //   'onStateChange': onPlayerStateChange
       // }
     });
+  }
+
+  function togglePause() {
+    if (player.getPlayerState() == 2 || player.getPlayerState() == 0 || player.getPlayerState() == 5) {
+      player.playVideo();
+    } else {
+      player.pauseVideo();
+    }
   }

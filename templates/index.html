@@ -10,35 +10,50 @@
 
   <link rel="stylesheet" href="static/css/normalize.css">
   <link rel="stylesheet" href="static/css/skeleton.css">
+  <link rel="stylesheet" href="static/css/app.css">
 
   <script src="static/js/jquery-2.1.4.min.js"></script>
   <script src="static/js/video.js"></script>
   <script src="static/js/app.js"></script>
 </head>
 <body>
-  <div class="container" style="width:1024px">
-	<h1>Fresh Beets<small> by PyPhy+Dev</small></h1>
-    <div class="row">
-      <div class="twelve column">
-        <div id="player"></div>
+  <div class="container">
+    <h1 class="title">Fresh Beets<small> by PyPhy+Dev</small></h1>
+    <h4 class="slogan">The beets you want</h4>
+
+    <div id="instructions" class="subpage">
+    Navodila!
+      <div class="progress"></div>
+    </div>
+
+    <div id="measuring" class="subpage">
+      <div class="movement-wrapper">
+        <div class="movement"></div>
+      </div>
+      <div class="progress"></div>
+    </div>
+
+    <div id="result" class="subpage">
+      <div class="row">
+        <div class="twelve column">
+          <div class="video-wrapper">
+            <div id="player"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row" id="statistics">
+        <div class="ten columns">
+          <h2>Last recorded BPM: <span id="bpm">Calculating...</span></h2>
+          <h2>Current song: <span id="song">N/A</span>, <a href="" id="itunes" target="_blank">iTunes preview</a></h2>
+        </div>
+        <div class="two columns">
+          <div class="itunes"><div class="overlay"></div></div>
+          
+        </div>
+
+        <div class="progress"></div>
       </div>
     </div>
-    <div class="row" id="statistics">
-      <div class="twelve columns">
-        <h2>Last recorded BPM: <span id="bpm">Calculating...</span></h2>
-      </div>
-    </div>
-    <div class="row" id="statistics">
-      <div class="twelve columns">
-        <h2>Current song: <span id="song">N/A</span></h2>
-      </div>
-    </div>
-    <div class="row" id="statistics">
-      <div class="twelve columns">
-        <h2><a href="" id="itunes" target="_blank">iTunes preview</a></h2>
-      </div>
-    </div>
-  </div>
   </div>
 </body>
 </html>
