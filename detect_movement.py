@@ -31,13 +31,16 @@ def pravila(acc_data, times=[],
             max(acc_data[0][startI:]) > 200 and \
             max(acc_data[2][startI:]) > 200:
         ret += 'obrat '
+    if min(acc_data[0][startI:]) < -900 and \
+       max(acc_data[0][startI:]) > 1100:
+       ret += 'metal '
     ret = ret.strip()
     if not debug:
         return ret
-    r2 = []
+    r2 = ''
     for i in range(3):
-        r2 += [min(acc_data[i][startI:])]
-        r2 += [max(acc_data[i][startI:])]
+        r2 += '{:^10}'.format("%.2f" % (min(acc_data[i][startI:])))
+        r2 += '{:^10}'.format("%.2f" % (max(acc_data[i][startI:])))
     return ret, r2
 
 def split_inputs(filename, sensor, splits):
