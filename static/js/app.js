@@ -39,7 +39,7 @@ var calculatedCallback = function(e)
     if (player) {
     	player.loadVideoById(data.yt_id);
 	} else {
-		initPlayer();
+		initPlayer(data.yt_id);
 	}
 
 	$('#song').text(data.song);
@@ -50,11 +50,12 @@ var calculatedCallback = function(e)
 
 	$('#measuring').fadeOut(animationDuration, function() {
 		$('#result').fadeIn(animationDuration);
+		jawCount = 0;
+		$('#result .progress').width(0);
 	});
 };
 
 bpmStream.addEventListener('move', moveCallback, false);
-bpmStream.addEventListener('calculated', calculatedCallback, false);
 
 var headCallback = function(e)
 {
@@ -73,22 +74,27 @@ var jawCallback = function(e)
 
     console.log(e.type, e.data);
 
+    if (jawCount > 10) {
+    	return;
+    }
+
     jawCount += 1;
 
 	var progress;
 	if ($('#instructions:visible').length) {
 		progress = $('#instructions .progress');
 	} else {
-		progress = $('#results .progress');
+		progress = $('#result .progress');
 	}
 
 	progress.show();
-    progress.css('width', 100 * jawCount / 20 + '%');
+    progress.css('width', 100 * jawCount / 10 + '%');
 
-    if (jawCount >= 20) {
+    if (jawCount == 10) {
     	if ($('#instructions:visible').length) {
     		$.get('/restart', startMeasuring);
-    		jawCount = 0;
+    	} else if ($('#result:visible').length) {
+    		$.get('/restart', startMeasuring);
     	}
     }
 };
@@ -127,16 +133,30 @@ var updateMeasuringProgress = function()
 	var diff = new Date().getTime() - measuringProgress;
 
 	$('#measuring .progress').show();
-	$('#measuring .progress').css('width', 100 * diff / (5 * 1000) + '%');
+	$('#measuring .progress').css('width', 100 * diff / (6 * 1000) + '%');
 
-	if (diff < 5 * 1000) {
+	if (diff < 6 * 1000) {
 		window.setTimeout(updateMeasuringProgress, 20);
 	}
 };
 
 var startMeasuring = function()
 {
-	$('#instructions').fadeOut(animationDuration, function() {
+	var current;
+	if ($('#instructions:visible').length) {
+		current = '#instructions';
+	} else {
+		current = '#result';
+	}
+
+	if (player) {
+		player.destroy();
+		player = null;
+	}
+
+	$(current).fadeOut(animationDuration, function() {
+		bpmStream.addEventListener('calculated', calculatedCallback, false);
+
 		$('#measuring').fadeIn(animationDuration);
 		$('#measuring .movement-wrapper').height($('#measuring .movement-wrapper').width());
 		$('#measuring .movement').height($('#measuring .movement-wrapper').width());
