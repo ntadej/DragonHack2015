@@ -10,7 +10,7 @@ import numpy as np
 from numpy.fft import fft
 from collections import deque
 
-#from detect_movement import *
+from detect_movement import pravila
 
 class MuseServer(ServerThread):
 
@@ -23,6 +23,9 @@ class MuseServer(ServerThread):
     jaw_lock = None
     jaw_list = None
 
+    senstate_lock = None
+    senstate = None
+
     # listen for messages on port 5001
 
     def __init__(self):
@@ -34,6 +37,9 @@ class MuseServer(ServerThread):
 
         self.jaw_lock = th.RLock()
         self.jaw_list = deque()
+
+        self.senstate_lock = th.RLock()
+        self.senstate = []
 
         ServerThread.__init__(self, 5001)
 
@@ -58,7 +64,7 @@ class MuseServer(ServerThread):
             self.blink_list.append(time.time())
             self.blink_lock.release()
 
-    # receive blink data
+    # receive jaw data
     @make_method('/muse/elements/jaw_clench', 'i')
     def jaw_callback(self, path, args):
 
@@ -66,6 +72,15 @@ class MuseServer(ServerThread):
             self.jaw_lock.acquire()
             self.jaw_list.append(time.time())
             self.jaw_lock.release()
+
+    # receive sensor state data
+    @make_method('/muse/elements/horseshoe', 'ffff')
+    def horseshoe_callback(self, path, args):
+
+        if args[0]:
+            self.senstate_lock.acquire()
+            self.senstate = args
+            self.senstate_lock.release()
 
     @make_method(None, None)
     def fallback(self, path, args, types, src):
@@ -93,13 +108,18 @@ if __name__ == "__main__":
         server.acc_list = []
         server.acc_lock.release()
 
+        senstate_lock = server.senstate_lock.acquire()
+        senstate = server.senstate[:]
+        server.senstate_lock.release()
+        print('Sensors state', senstate)
+
         if tmp:
             size = len(tmp[0])
             fs = [i / t for i in range(size // 2)]
             tmp = [np.array(x) - sum(x) / len(x) for x in tmp]
             acc_fft = [fft(x)[: size // 2] for x in tmp]
-            imax = [sorted(enumerate(x), key=lambda k: abs(k[1]))[-1] for x in acc_fft]
-            print(fs[imax[0][0]], fs[imax[0][0]] * 60)
+            #imax = [sorted(enumerate(x), key=lambda k: abs(k[1]))[-1] for x in acc_fft]
+            #print(fs[imax[0][0]], fs[imax[0][0]] * 60)
             print(pravila(tmp, duration=t, debug=True))
 
         time.sleep(t)
