@@ -14,14 +14,15 @@ html, body {
 #measuring {
 
 }
-	#measuring .progress {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-	}
 
 #result {
 
+}
+
+.logo {
+	float: left;
+	max-width: 100px;
+	margin-top: 16px;
 }
 
 .title {
@@ -34,7 +35,10 @@ html, body {
 
 .progress {
 	height: 24px;
-	background: red;
+	background: #D32931;
+	position: fixed;
+	bottom: 0;
+	left: 0;
 }
 
 .movement-wrapper {
@@ -45,7 +49,7 @@ html, body {
 	.movement {
 		margin: auto auto;
 		border-radius: 50%;
-		background: red;
+		background: #D32931;
 		position: relative;
 		top: 50%;
 	}
